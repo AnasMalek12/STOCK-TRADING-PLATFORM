@@ -17,7 +17,7 @@ function RightSection({
           </a>
         </div>
         <div className="col-6">
-          <img src={imageURL} />
+          <img src={imageURL} className="img-fluid" />
         </div>
       </div>
     </div>
