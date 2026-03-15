@@ -1,16 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [username, setUsername] = useState("");
 
   const handleMenuClick = (index) => {
     setSelectedMenu(index);
   };
-  const handleProfileClick = (index) => {
+
+  const handleProfileClick = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
+
+  const handleLogout = async () => {
+    try {
+      const { data } = await axios.post(
+        "http://localhost:3002/logout",
+        {},
+        { withCredentials: true },
+      );
+      if (data.success) {
+        localStorage.removeItem("token");
+        window.location.href = "http://localhost:3000";
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // 🔹 Fetch logged in user
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.post(
+          "http://localhost:3002/",
+          {},
+          { withCredentials: true },
+        );
+
+        if (data.status) {
+          setUsername(data.user);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const menuClass = "menu";
   const activeMenuClass = "menu selected";
@@ -96,9 +136,58 @@ const Menu = () => {
 
         <hr />
 
-        <div className="profile" onClick={handleProfileClick}>
-          <div className="avatar">ZU</div>
-          <p className="username">USERID</p>
+        {/* Profile Section */}
+        <div
+          className="profile"
+          onClick={handleProfileClick}
+          style={{ position: "relative" }}
+        >
+          <div className="avatar">
+            {username ? username.charAt(0).toUpperCase() : "U"}
+          </div>
+
+          <p className="username">{username || "Loading..."}</p>
+
+          {isProfileDropdownOpen && (
+            <div
+              style={{
+                position: "absolute",
+                top: "100%",
+                right: "0",
+                background: "white",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                zIndex: "1000",
+                minWidth: "120px",
+              }}
+            >
+              <button
+                onClick={handleLogout}
+                style={{
+                  width: "100%",
+                  background: "#fdecea",
+                  border: "none",
+                  borderRadius: "6px",
+                  color: "#e74c3c",
+                  fontSize: "14px",
+                  padding: "10px",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                  transition: "0.2s",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = "#fadbd8")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.background = "#fdecea")
+                }
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

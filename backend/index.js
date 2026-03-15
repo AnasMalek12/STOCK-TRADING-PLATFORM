@@ -3,10 +3,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dns = require("dns");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const authRoute = require("./Routes/AuthRoute");
 const cors = require("cors");
-const { HoldingsModel } = require("./model/HoldingsModel");
-const { PositionsModel } = require("./model/PositionsModel");
-const { OrdersModel } = require("./model/OrdersModel");
+const { HoldingsModel } = require("./Models/HoldingsModel");
+const { PositionsModel } = require("./Models/PositionsModel");
+const { OrdersModel } = require("./Models/OrdersModel");
+const { requireAuth } = require("./Middlewares/AuthMiddleware");
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
@@ -15,8 +18,19 @@ const uri = process.env.MONGO_URL;
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+app.use(express.json());
+
+app.use("/", authRoute);
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
@@ -183,25 +197,81 @@ app.use(bodyParser.json());
 //   res.send("Done!");
 // });
 
-app.get("/allHoldings", async (req, res) => {
-  let allHoldings = await HoldingsModel.find({});
+app.get("/allHoldings", requireAuth, async (req, res) => {
+  let allHoldings = await HoldingsModel.find({ userId: req.user._id });
   res.json(allHoldings);
 });
 
-app.get("/allPositions", async (req, res) => {
-  let allPositions = await PositionsModel.find({});
+app.get("/allPositions", requireAuth, async (req, res) => {
+  let allPositions = await PositionsModel.find({ userId: req.user._id });
   res.json(allPositions);
 });
 
-app.post("/newOrder", async (req, res) => {
+app.get("/allOrders", requireAuth, async (req, res) => {
+  let allOrders = await OrdersModel.find({ userId: req.user._id });
+  res.json(allOrders);
+});
+
+app.post("/newOrder", requireAuth, async (req, res) => {
   let newOrder = new OrdersModel({
+    userId: req.user._id,
     name: req.body.name,
     qty: req.body.qty,
     price: req.body.price,
     mode: req.body.mode,
   });
+  await newOrder.save();
 
-  newOrder.save();
+  if (req.body.mode === "BUY") {
+    let newHolding = new HoldingsModel({
+      userId: req.user._id,
+      name: req.body.name,
+      qty: req.body.qty,
+      avg: req.body.price,
+      price: req.body.price,
+      net: "+0.00%",
+      day: "+0.00%",
+    });
+    await newHolding.save();
+
+    let newPosition = new PositionsModel({
+      userId: req.user._id,
+      product: "CNC",
+      name: req.body.name,
+      qty: req.body.qty,
+      avg: req.body.price,
+      price: req.body.price,
+      net: "+0.00%",
+      day: "+0.00%",
+      isLoss: false,
+    });
+    await newPosition.save();
+  } else if (req.body.mode === "SELL") {
+    const sellQty = Number(req.body.qty);
+    
+    // Update Holding
+    let existingHolding = await HoldingsModel.findOne({ userId: req.user._id, name: req.body.name });
+    if (existingHolding) {
+      if (existingHolding.qty <= sellQty) {
+        await HoldingsModel.deleteOne({ _id: existingHolding._id });
+      } else {
+        existingHolding.qty -= sellQty;
+        await existingHolding.save();
+      }
+    }
+
+    // Update Position
+    let existingPosition = await PositionsModel.findOne({ userId: req.user._id, name: req.body.name });
+    if (existingPosition) {
+      if (existingPosition.qty <= sellQty) {
+        await PositionsModel.deleteOne({ _id: existingPosition._id });
+      } else {
+        existingPosition.qty -= sellQty;
+        await existingPosition.save();
+      }
+    }
+  }
+
   res.send("Order saved!");
 });
 
@@ -210,3 +280,4 @@ app.listen(PORT, () => {
   mongoose.connect(uri);
   console.log("DB connected!");
 });
+
