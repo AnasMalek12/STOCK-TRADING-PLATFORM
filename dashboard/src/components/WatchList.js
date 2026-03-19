@@ -1,7 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Tooltip, Grow } from "@mui/material";
-import { watchlist } from "../data/data";
+import { watchlist as initialData } from "../data/data";
 import GeneralContext from "./GeneralContext";
+import io from "socket.io-client";
+import "./WatchList.css";
+
 import {
   BarChartOutlined,
   KeyboardArrowDown,
@@ -9,7 +12,48 @@ import {
   MoreHoriz,
 } from "@mui/icons-material";
 
+// ✅ WebSocket connection
+const socket = io("http://localhost:3002", {
+  transports: ["websocket"],
+});
+socket.on("connect", () => {
+  console.log("CONNECTED TO SOCKET ✅");
+});
+
+socket.on("connect_error", (err) => {
+  console.log("SOCKET ERROR ❌", err);
+});
 const WatchList = () => {
+  const [stocks, setStocks] = useState(initialData);
+
+  useEffect(() => {
+    socket.on("priceUpdate", (updatedStocks) => {
+      setStocks((prevStocks) =>
+        prevStocks.map((stock) => {
+          const updated = updatedStocks.find((s) => s.name === stock.name);
+
+          if (!updated) return stock;
+
+          const isDown = updated.price < stock.price;
+
+          const percentChange = (
+            ((updated.price - stock.price) / stock.price) *
+            100
+          ).toFixed(2);
+
+          return {
+            ...stock,
+            price: updated.price,
+            percent: `${percentChange}%`,
+            isDown: isDown,
+          };
+        }),
+      );
+    });
+
+    return () => socket.off("priceUpdate");
+  }, []);
+
   return (
     <div className="watchlist-container">
       <div className="search-container">
@@ -20,11 +64,11 @@ const WatchList = () => {
           placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx"
           className="search"
         />
-        <span className="counts"> {watchlist.length} / 50</span>
+        <span className="counts"> {stocks.length} / 50</span>
       </div>
 
       <ul className="list">
-        {watchlist.map((stock, index) => {
+        {stocks.map((stock, index) => {
           return <WatchListItem stock={stock} key={index} />;
         })}
       </ul>
@@ -34,41 +78,44 @@ const WatchList = () => {
 
 export default WatchList;
 
+// ---------------- ITEM ----------------
+
 const WatchListItem = ({ stock }) => {
   const [showWatchlistActions, setShowWatchlistActions] = useState(false);
-  const handleMouseEnter = (e) => {
-    setShowWatchlistActions(true);
-  };
-  const handleMouseLeave = (e) => {
-    setShowWatchlistActions(false);
-  };
+
   return (
-    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <li
+      onMouseEnter={() => setShowWatchlistActions(true)}
+      onMouseLeave={() => setShowWatchlistActions(false)}
+    >
       <div className="item">
         <p className={stock.isDown ? "down" : "up"}>{stock.name}</p>
+
         <div className="itemInfo">
           <span className="percent">{stock.percent}</span>
+
           {stock.isDown ? (
             <KeyboardArrowDown className="down" />
           ) : (
             <KeyboardArrowUp className="up" />
           )}
-          <span className="price">{stock.price}</span>
+
+          {/* ✅ PRICE COLOR LOGIC */}
+          <span className={`price ${stock.isDown ? "down" : "up"}`}>
+            ₹{stock.price}
+          </span>
         </div>
       </div>
+
       {showWatchlistActions && <WatchListActions uid={stock.name} />}
     </li>
   );
 };
 
+// ---------------- ACTIONS ----------------
+
 const WatchListActions = ({ uid }) => {
   const generalContext = useContext(GeneralContext);
-  const handleBuyClick = () => {
-    generalContext.openBuyWindow(uid);
-  };
-  const handleSellClick = () => {
-    generalContext.openSellWindow(uid);
-  };
 
   return (
     <span className="actions">
@@ -78,19 +125,21 @@ const WatchListActions = ({ uid }) => {
           placement="top"
           arrow
           TransitionComponent={Grow}
-          onClick={handleBuyClick}
+          onClick={() => generalContext.openBuyWindow(uid)}
         >
           <button className="buy">Buy</button>
         </Tooltip>
+
         <Tooltip
           title="Sell (S)"
           placement="top"
           arrow
           TransitionComponent={Grow}
-          onClick={handleSellClick}
+          onClick={() => generalContext.openSellWindow(uid)}
         >
           <button className="sell">Sell</button>
         </Tooltip>
+
         <Tooltip
           title="Analytics (A)"
           placement="top"
@@ -101,6 +150,7 @@ const WatchListActions = ({ uid }) => {
             <BarChartOutlined className="icon" />
           </button>
         </Tooltip>
+
         <Tooltip
           title="More (B)"
           placement="top"

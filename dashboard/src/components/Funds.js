@@ -1,11 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import io from "socket.io-client";
 import { Link } from "react-router-dom";
 
+const socket = io("http://localhost:3002");
+
 const Funds = () => {
+  const [holdings, setHoldings] = useState([]);
+
+  // ✅ fetch holdings
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/allHoldings", {
+        withCredentials: true,
+      })
+      .then((res) => setHoldings(res.data));
+  }, []);
+
+  // 🔥 live update
+  useEffect(() => {
+    socket.on("priceUpdate", (updatedStocks) => {
+      setHoldings((prev) =>
+        prev.map((h) => {
+          const stock = updatedStocks.find((s) => s.name === h.name);
+          if (!stock) return h;
+
+          return { ...h, price: stock.price };
+        }),
+      );
+    });
+
+    return () => socket.off("priceUpdate");
+  }, []);
+
+  // 🔥 calculations
+  const investment = holdings.reduce((acc, h) => acc + h.avg * h.qty, 0);
+
+  const currentValue = holdings.reduce((acc, h) => acc + h.price * h.qty, 0);
+
+  const availableMargin = currentValue;
+  const usedMargin = investment;
+  const availableCash = currentValue - investment;
+
+  // 💰 format ₹
+  const format = (num) =>
+    "₹" + num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
   return (
     <>
       <div className="funds">
-        <p>Instant, zero-cost fund transfers with UPI </p>
+        <p>Instant, zero-cost fund transfers with UPI</p>
         <Link className="btn btn-green">Add funds</Link>
         <Link className="btn btn-blue">Withdraw</Link>
       </div>
@@ -19,57 +63,66 @@ const Funds = () => {
           <div className="table">
             <div className="data">
               <p>Available margin</p>
-              <p className="imp colored">4,043.10</p>
+              <p className="imp colored">{format(availableMargin)}</p>
             </div>
+
             <div className="data">
               <p>Used margin</p>
-              <p className="imp">3,757.30</p>
+              <p className="imp">{format(usedMargin)}</p>
             </div>
+
             <div className="data">
               <p>Available cash</p>
-              <p className="imp">4,043.10</p>
+              <p className="imp">{format(availableCash)}</p>
             </div>
+
             <hr />
+
             <div className="data">
               <p>Opening Balance</p>
-              <p>4,043.10</p>
+              <p>{format(investment)}</p>
             </div>
-            <div className="data">
-              <p>Opening Balance</p>
-              <p>3736.40</p>
-            </div>
+
             <div className="data">
               <p>Payin</p>
-              <p>4064.00</p>
+              <p>{format(currentValue)}</p>
             </div>
+
             <div className="data">
               <p>SPAN</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
+
             <div className="data">
               <p>Delivery margin</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
+
             <div className="data">
               <p>Exposure</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
+
             <div className="data">
               <p>Options premium</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
+
             <hr />
+
             <div className="data">
               <p>Collateral (Liquid funds)</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
+
             <div className="data">
               <p>Collateral (Equity)</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
+
             <div className="data">
               <p>Total Collateral</p>
-              <p>0.00</p>
+              <p>₹0.00</p>
             </div>
           </div>
         </div>
