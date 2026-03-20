@@ -7,6 +7,7 @@ const socket = io("http://localhost:3002");
 
 const Summary = () => {
   const [holdings, setHoldings] = useState([]);
+  const [balance, setBalance] = useState(0);
 
   // ✅ Fetch holdings
   useEffect(() => {
@@ -20,6 +21,16 @@ const Summary = () => {
       .catch((err) => {
         console.log("Holdings fetch error:", err);
       });
+  }, []);
+
+  // ✅ fetch funds
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/userFunds", {
+        withCredentials: true,
+      })
+      .then((res) => setBalance(res.data.balance || 0))
+      .catch((err) => console.error(err));
   }, []);
 
   // 🔥 Live updates via WebSocket
@@ -49,6 +60,10 @@ const Summary = () => {
 
   const totalPnL = currentValue - totalInvestment;
 
+  const availableFunds = balance;
+
+  const availableMargin = currentValue + availableFunds;
+
   const pnlPercent =
     totalInvestment > 0 ? ((totalPnL / totalInvestment) * 100).toFixed(2) : 0;
 
@@ -60,6 +75,11 @@ const Summary = () => {
     num.toLocaleString("en-IN", {
       maximumFractionDigits: 2,
     });
+
+  // 💰 format ₹
+  const format = (num) =>
+    "₹" + num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
 
   return (
     <>
@@ -77,7 +97,7 @@ const Summary = () => {
 
         <div className="data">
           <div className="first">
-            <h3>{formatCurrency(currentValue)}</h3>
+            <h3>{formatCurrency(availableMargin)}</h3>
             <p>Margin available</p>
           </div>
 
@@ -88,7 +108,7 @@ const Summary = () => {
               Margins used <span>{formatCurrency(totalInvestment)}</span>
             </p>
             <p>
-              Opening balance <span>₹5000</span>
+              User balance <span>{format(availableFunds)}</span>
             </p>
           </div>
         </div>

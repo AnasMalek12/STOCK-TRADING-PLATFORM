@@ -113,6 +113,38 @@ app.get("/allOrders", requireAuth, async (req, res) => {
   res.json(allOrders);
 });
 
+app.get("/userFunds", requireAuth, async (req, res) => {
+  res.json({ balance: req.user.balance || 0 });
+});
+
+app.post("/addFunds", requireAuth, async (req, res) => {
+  const amount = Number(req.body.amount);
+  if (!amount || amount <= 0) {
+    return res.status(400).send("Invalid amount");
+  }
+  
+  req.user.balance = (req.user.balance || 0) + amount;
+  await req.user.save();
+  
+  res.json({ message: "Funds added", balance: req.user.balance });
+});
+
+app.post("/withdrawFunds", requireAuth, async (req, res) => {
+  const amount = Number(req.body.amount);
+  if (!amount || amount <= 0) {
+    return res.status(400).send("Invalid amount");
+  }
+  
+  if ((req.user.balance || 0) < amount) {
+    return res.status(400).send("Insufficient funds");
+  }
+
+  req.user.balance = req.user.balance - amount;
+  await req.user.save();
+  
+  res.json({ message: "Funds withdrawn", balance: req.user.balance });
+});
+
 app.post("/newOrder", requireAuth, async (req, res) => {
   let newOrder = new OrdersModel({
     userId: req.user._id,
@@ -125,6 +157,14 @@ app.post("/newOrder", requireAuth, async (req, res) => {
   await newOrder.save();
 
   if (req.body.mode === "BUY") {
+    const buyQty = Number(req.body.qty);
+    const buyPrice = Number(req.body.price);
+    const totalBuyValue = buyQty * buyPrice;
+
+    // Deduct money from user wallet
+    req.user.balance = (req.user.balance || 0) - totalBuyValue;
+    await req.user.save();
+
     let newHolding = new HoldingsModel({
       userId: req.user._id,
       name: req.body.name,
@@ -156,6 +196,7 @@ app.post("/newOrder", requireAuth, async (req, res) => {
 
     // ✅ ADD MONEY TO USER WALLET
     req.user.balance = (req.user.balance || 0) + totalSellValue;
+    await req.user.save();
 
     let existingHolding = await HoldingsModel.findOne({
       userId: req.user._id,

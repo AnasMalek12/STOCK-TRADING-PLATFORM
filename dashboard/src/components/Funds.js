@@ -7,6 +7,7 @@ const socket = io("http://localhost:3002");
 
 const Funds = () => {
   const [holdings, setHoldings] = useState([]);
+  const [balance, setBalance] = useState(0);
 
   // ✅ fetch holdings
   useEffect(() => {
@@ -16,6 +17,53 @@ const Funds = () => {
       })
       .then((res) => setHoldings(res.data));
   }, []);
+
+  // ✅ fetch funds
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/userFunds", {
+        withCredentials: true,
+      })
+      .then((res) => setBalance(res.data.balance || 0))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const handleAddFunds = () => {
+    const amountStr = window.prompt("Enter amount to add Funds:", "10000");
+    const amount = Number(amountStr);
+    if (amount > 0) {
+      axios
+        .post(
+          "http://localhost:3002/addFunds",
+          { amount },
+          { withCredentials: true }
+        )
+        .then((res) => setBalance(res.data.balance))
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const handleWithdrawFunds = () => {
+    const amountStr = window.prompt("Enter amount to withdraw:", "1000");
+    const amount = Number(amountStr);
+    if (amount > 0) {
+      if (amount > balance) {
+        alert("Insufficient funds!");
+        return;
+      }
+      axios
+        .post(
+          "http://localhost:3002/withdrawFunds",
+          { amount },
+          { withCredentials: true }
+        )
+        .then((res) => setBalance(res.data.balance))
+        .catch((err) => {
+          console.error(err);
+          alert(err.response?.data || "Error withdrawing funds");
+        });
+    }
+  };
 
   // 🔥 live update
   useEffect(() => {
@@ -40,7 +88,7 @@ const Funds = () => {
 
   const availableMargin = currentValue;
   const usedMargin = investment;
-  const availableCash = currentValue - investment;
+  const availableFunds = balance;
 
   // 💰 format ₹
   const format = (num) =>
@@ -50,8 +98,8 @@ const Funds = () => {
     <>
       <div className="funds">
         <p>Instant, zero-cost fund transfers with UPI</p>
-        <Link className="btn btn-green">Add funds</Link>
-        <Link className="btn btn-blue">Withdraw</Link>
+        <Link className="btn btn-green" onClick={handleAddFunds}>Add funds</Link>
+        <Link className="btn btn-blue" onClick={handleWithdrawFunds}>Withdraw</Link>
       </div>
 
       <div className="row">
@@ -72,8 +120,8 @@ const Funds = () => {
             </div>
 
             <div className="data">
-              <p>Available cash</p>
-              <p className="imp">{format(availableCash)}</p>
+              <p>Available funds</p>
+              <p className="imp">{format(availableFunds)}</p>
             </div>
 
             <hr />
