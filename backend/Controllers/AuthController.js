@@ -2,62 +2,111 @@ const User = require("../Models/UserModel");
 const { createSecretToken } = require("../util/SecretToken");
 const bcrypt = require("bcryptjs");
 
-module.exports.Signup = async (req, res, next) => {
+// Standardized cookie options for reuse
+const cookieOptions = {
+  httpOnly: true, // Prevents XSS attacks
+  secure: process.env.NODE_ENV === "production", // Requires HTTPS in production
+  sameSite: "strict", // Prevents CSRF attacks
+  maxAge: 24 * 60 * 60 * 1000, // 1 day (match JWT expiry)
+};
+
+module.exports.Signup = async (req, res) => {
   try {
-    const { email, password, username, createdAt } = req.body;
+    const { email, password, username } = req.body;
+
+    // 1. Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.json({ message: "User already exists" });
+      return res
+        .status(409)
+        .json({ success: false, message: "User already exists" });
     }
-    const user = await User.create({ email, password, username, createdAt });
-    const token = createSecretToken(user._id);
-    res.cookie("token", token, {
-      withCredentials: true,
-      httpOnly: false,
+
+    const user = await User.create({
+      email,
+      password, // Use hashedPassword here if not using a Mongoose hook
+      username,
     });
-    res
-      .status(201)
-      .json({ message: "User signed in successfully", success: true, user });
-    next();
+
+    // 2. Generate token and set cookie
+    const token = createSecretToken(user._id);
+    res.cookie("token", token, cookieOptions);
+
+    // 3. Remove password from the response object
+    user.password = undefined;
+
+    return res.status(201).json({
+      success: true,
+      message: "User signed in successfully",
+      user,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Signup Error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
-module.exports.Login = async (req, res, next) => {
+module.exports.Login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if(!email || !password ){
-      return res.json({message:'All fields are required'})
-    }
-    const user = await User.findOne({ email });
-    if(!user){
-      return res.json({message:'Incorrect password or email' }) 
-    }
-    const auth = await bcrypt.compare(password,user.password)
-    if (!auth) {
-      return res.json({message:'Incorrect password or email' }) 
-    }
-     const token = createSecretToken(user._id);
-     res.cookie("token", token, {
-       withCredentials: true,
-       httpOnly: false,
-     });
-     res.status(201).json({ message: "User logged in successfully", success: true });
-     next()
-  } catch (error) {
-    console.error(error);
-  }
-}
 
-module.exports.Logout = async (req, res, next) => {
-  try {
-    res.clearCookie("token", {
-      withCredentials: true,
-      httpOnly: false,
-    });
-    res.json({ message: "Logout successful", success: true });
+    // 1. Validate input
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
+    }
+
+    // 2. Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Incorrect email or password" });
+    }
+
+    // 3. Verify password
+    const auth = await bcrypt.compare(password, user.password);
+    if (!auth) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Incorrect email or password" });
+    }
+
+    // 4. Generate token and set cookie
+    const token = createSecretToken(user._id);
+    res.cookie("token", token, cookieOptions);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "User logged in successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("Login Error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+module.exports.Logout = async (req, res) => {
+  try {
+    // Note: clearCookie requires the exact same options (domain, path, secure, etc.)
+    // used to set the cookie, except for maxAge/expires.
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    console.error("Logout Error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };

@@ -77,7 +77,7 @@ setInterval(() => {
 
   // 📡 SEND TO FRONTEND
   io.emit("priceUpdate", stocks);
-}, 1000);
+}, 2000);
 
 // =======================
 // 🔌 SOCKET CONNECTION
@@ -122,10 +122,10 @@ app.post("/addFunds", requireAuth, async (req, res) => {
   if (!amount || amount <= 0) {
     return res.status(400).send("Invalid amount");
   }
-  
+
   req.user.balance = (req.user.balance || 0) + amount;
   await req.user.save();
-  
+
   res.json({ message: "Funds added", balance: req.user.balance });
 });
 
@@ -134,14 +134,14 @@ app.post("/withdrawFunds", requireAuth, async (req, res) => {
   if (!amount || amount <= 0) {
     return res.status(400).send("Invalid amount");
   }
-  
+
   if ((req.user.balance || 0) < amount) {
     return res.status(400).send("Insufficient funds");
   }
 
   req.user.balance = req.user.balance - amount;
   await req.user.save();
-  
+
   res.json({ message: "Funds withdrawn", balance: req.user.balance });
 });
 

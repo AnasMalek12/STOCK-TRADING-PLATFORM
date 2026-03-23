@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: new Date(),
+    default: Date.now,
   },
   balance: {
     type: Number,
@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function () {
+  // If the password hasn't been modified, skip hashing and move on
+  if (!this.isModified("password")) {
+    return;
+  }
+
+  // Hash the password automatically
   this.password = await bcrypt.hash(this.password, 12);
 });
 
