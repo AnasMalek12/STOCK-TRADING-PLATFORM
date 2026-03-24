@@ -6,6 +6,40 @@
   animation: flashRed 0.3s;
 }
 
+.watchlist-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.search-container {
+  padding: 10px;
+  background: white;
+  z-index: 2;
+}
+
+.watchlist-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.watchlist-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.watchlist-scroll::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.chart-container {
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+
+  border-top: 1px solid #eee;
+  background: white;
+}
+
 @keyframes flashGreen {
   0% {
     background: rgba(0, 255, 0, 0.2);

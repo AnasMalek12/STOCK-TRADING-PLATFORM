@@ -5,13 +5,8 @@ import GeneralContext from "./GeneralContext";
 import io from "socket.io-client";
 import "./WatchList.css";
 
-import {
-  BarChartOutlined,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  MoreHoriz,
-} from "@mui/icons-material";
-
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { DoughnutChart } from "./DoughnutChart";
 // ✅ WebSocket connection
 const socket = io("http://localhost:3002", {
   transports: ["websocket"],
@@ -23,8 +18,35 @@ socket.on("connect", () => {
 socket.on("connect_error", (err) => {
   console.log("SOCKET ERROR ❌", err);
 });
+
 const WatchList = () => {
   const [stocks, setStocks] = useState(initialData);
+  const data = {
+    labels: stocks.map((stock) => stock.name),
+    datasets: [
+      {
+        label: "Price",
+        data: stocks.map((stock) => stock.price),
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(153, 102, 255, 0.5)",
+          "rgba(255, 159, 64, 0.5)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
 
   useEffect(() => {
     socket.on("priceUpdate", (updatedStocks) => {
@@ -67,11 +89,17 @@ const WatchList = () => {
         <span className="counts"> {stocks.length} / 50</span>
       </div>
 
-      <ul className="list">
-        {stocks.map((stock, index) => {
-          return <WatchListItem stock={stock} key={index} />;
-        })}
-      </ul>
+      <div className="watchlist-scroll">
+        <ul className="list">
+          {stocks.map((stock, index) => {
+            return <WatchListItem stock={stock} key={index} />;
+          })}
+        </ul>
+      </div>
+
+      <div className="chart-container">
+        <DoughnutChart data={data} />
+      </div>
     </div>
   );
 };
@@ -138,28 +166,6 @@ const WatchListActions = ({ uid }) => {
           onClick={() => generalContext.openSellWindow(uid)}
         >
           <button className="sell">Sell</button>
-        </Tooltip>
-
-        <Tooltip
-          title="Analytics (A)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="action">
-            <BarChartOutlined className="icon" />
-          </button>
-        </Tooltip>
-
-        <Tooltip
-          title="More (B)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="action">
-            <MoreHoriz className="icon" />
-          </button>
         </Tooltip>
       </span>
     </span>

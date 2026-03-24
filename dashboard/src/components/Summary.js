@@ -80,7 +80,6 @@ const Summary = () => {
   const format = (num) =>
     "₹" + num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
-
   return (
     <>
       {/* 👤 USER */}

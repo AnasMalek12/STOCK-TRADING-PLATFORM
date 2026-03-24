@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
+import { VerticalGraph } from "./VerticalGraph";
 
 // ✅ connect to backend
 const socket = io("http://localhost:3002");
@@ -18,6 +19,21 @@ const Holdings = () => {
         setAllHoldings(res.data);
       });
   }, []);
+
+  //VerticalGraph.js data
+
+  const labels = allHoldings.map((stock) => stock.name);
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Stock Price",
+        data: allHoldings.map((stock) => stock.price),
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
 
   // 🔥 LIVE PRICE UPDATE
   useEffect(() => {
@@ -137,6 +153,8 @@ const Holdings = () => {
           <p>P&L</p>
         </div>
       </div>
+
+      <VerticalGraph data={data} />
     </>
   );
 };
