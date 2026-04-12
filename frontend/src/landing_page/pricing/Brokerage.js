@@ -3,13 +3,13 @@ import React from "react";
 function Brokerage() {
   return (
     <div className="container">
-      <div className="row p-5 mt-5 text-center border-top">
-        <div className="col-8 p-4">
-          <a href="" style={{ textDecoration: "none" }}>
-            <h3 className="fs-5 p-3">Brokerage calculator</h3>
+      <div className="row py-5 mt-5 text-center border-top">
+        <div className="col-12 col-md-8 p-3 p-md-4">
+          <a href="#" style={{ textDecoration: "none" }}>
+            <h3 className="fs-5 p-2 p-md-3">Brokerage calculator</h3>
           </a>
 
-          <ul className="text-start text-muted ">
+          <ul className="text-start text-muted ps-3 ps-md-4">
             <li className="mb-2">
               Calculates the total brokerage and charges for each trade before
               placing an order.
@@ -41,8 +41,8 @@ function Brokerage() {
           </ul>
         </div>
 
-        <div className="col-4 p-4">
-          <a href="" style={{ textDecoration: "none" }}>
+        <div className="col-12 col-md-4 p-3 p-md-4 mt-4 mt-md-0">
+          <a href="#" style={{ textDecoration: "none" }}>
             <h3 className="fs-5">List of charges</h3>
           </a>
         </div>

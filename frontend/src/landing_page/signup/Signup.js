@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-
-// Toast Imports
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -48,11 +46,9 @@ function Signup() {
         }, 1200);
       } else {
         // SIGNUP API
-        await axios.post(
-          "http://localhost:3002/signup",
-          formData, // Now contains { username, email, password }
-          { withCredentials: true },
-        );
+        await axios.post("http://localhost:3002/signup", formData, {
+          withCredentials: true,
+        });
 
         toast.success("Account Created Successfully 🎉");
 
@@ -78,40 +74,55 @@ function Signup() {
     <>
       <ToastContainer position="top-right" autoClose={2000} />
 
-      <div className="container-fluid vh-100">
-        <div className="row h-100">
+      <div className="container-fluid min-vh-100">
+        <div className="row min-vh-100">
           {/* LEFT SIDE */}
-          <div className="col-md-7 d-none d-md-flex flex-column justify-content-center px-5 bg-light">
-            <h1 className="fw-bold mb-3">
+          <div className="col-lg-7 d-none d-lg-flex flex-column justify-content-center px-5 bg-light">
+            <h1
+              className="fw-bold mb-3"
+              style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+            >
               Open a free demat and trading account online
             </h1>
-            <p className="text-muted fs-5">
+
+            <p
+              className="text-muted"
+              style={{
+                fontSize: "clamp(1rem, 2vw, 1.25rem)",
+                maxWidth: "600px",
+              }}
+            >
               Start investing brokerage free and join millions of investors.
             </p>
+
             <img
               src="https://zerodha.com/static/images/landing.png"
-              alt="trading"
+              alt="Trading Illustration"
               className="img-fluid mt-4"
               style={{ maxWidth: "500px" }}
             />
           </div>
 
           {/* RIGHT SIDE FORM */}
-          <div className="col-md-5 d-flex align-items-center justify-content-center">
-            <div style={{ width: "380px" }}>
-              <h3 className="text-center mb-4">
+          <div className="col-12 col-lg-5 d-flex align-items-center justify-content-center px-3 px-md-4 py-5">
+            <div
+              className="w-100 bg-white p-4 p-md-5 shadow-sm rounded"
+              style={{ maxWidth: "420px" }}
+            >
+              <h3 className="text-center mb-4 fw-semibold">
                 {isLogin ? "Login to Continue" : "Create your Account"}
               </h3>
 
               {/* Toggle Buttons */}
-              <div className="d-flex mb-4">
+              <div className="d-flex gap-2 mb-4">
                 <button
                   type="button"
-                  className={`btn ${isLogin ? "btn-primary" : "btn-outline-primary"} w-50 mx-2`}
+                  className={`btn ${isLogin ? "btn-primary" : "btn-outline-primary"} w-50`}
                   onClick={() => setIsLogin(true)}
                 >
                   Login
                 </button>
+
                 <button
                   type="button"
                   className={`btn ${!isLogin ? "btn-primary" : "btn-outline-primary"} w-50`}
@@ -124,38 +135,59 @@ function Signup() {
               {/* FORM */}
               <form onSubmit={handleSubmit}>
                 {!isLogin && (
-                  <input
-                    type="text"
-                    className="form-control mb-3"
-                    name="username"
-                    placeholder="Enter your username"
-                    value={formData.username} // FIX: Bind to formData.username
-                    onChange={handleChange}
-                    required
-                  />
+                  <div className="mb-3">
+                    <label htmlFor="username" className="form-label">
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      id="username"
+                      name="username"
+                      className="form-control py-2"
+                      placeholder="Enter your username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      autoComplete="username"
+                      required
+                    />
+                  </div>
                 )}
 
-                <input
-                  type="email"
-                  className="form-control mb-3"
-                  name="email"
-                  placeholder="Enter your email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    className="form-control py-2"
+                    placeholder="Enter your email address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    autoComplete="email"
+                    required
+                  />
+                </div>
 
-                <input
-                  type="password"
-                  className="form-control mb-4"
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="mb-4">
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    className="form-control py-2"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    required
+                  />
+                </div>
 
-                <button className="btn btn-primary w-100 py-2">
+                <button className="btn btn-primary w-100 py-2 fw-semibold">
                   {isLogin ? "Login" : "Create Account"}
                 </button>
               </form>

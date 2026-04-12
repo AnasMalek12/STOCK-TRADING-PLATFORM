@@ -21,7 +21,6 @@ const Holdings = () => {
   }, []);
 
   //VerticalGraph.js data
-
   const labels = allHoldings.map((stock) => stock.name);
 
   const data = {
@@ -29,8 +28,10 @@ const Holdings = () => {
     datasets: [
       {
         label: "Stock Price",
-        data: allHoldings.map((stock) => stock.price),
+        data: allHoldings.map((stock) => Number(stock.price)),
         backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
       },
     ],
   };

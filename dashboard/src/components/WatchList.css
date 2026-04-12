@@ -9,7 +9,7 @@
 .watchlist-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 90vh;
 }
 .search-container {
   padding: 10px;

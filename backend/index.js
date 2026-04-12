@@ -77,7 +77,7 @@ setInterval(() => {
 
   // 📡 SEND TO FRONTEND
   io.emit("priceUpdate", stocks);
-}, 2000);
+}, 1500);
 
 // =======================
 // 🔌 SOCKET CONNECTION
