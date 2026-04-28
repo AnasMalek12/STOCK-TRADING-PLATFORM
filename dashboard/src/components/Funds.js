@@ -36,7 +36,7 @@ const Funds = () => {
         .post(
           "http://localhost:3002/addFunds",
           { amount },
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((res) => setBalance(res.data.balance))
         .catch((err) => console.error(err));
@@ -55,7 +55,7 @@ const Funds = () => {
         .post(
           "http://localhost:3002/withdrawFunds",
           { amount },
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((res) => setBalance(res.data.balance))
         .catch((err) => {
@@ -98,89 +98,99 @@ const Funds = () => {
     <>
       <div className="funds">
         <p>Instant, zero-cost fund transfers with UPI</p>
-        <Link className="btn btn-green" onClick={handleAddFunds}>Add funds</Link>
-        <Link className="btn btn-blue" onClick={handleWithdrawFunds}>Withdraw</Link>
+
+        <div className="funds-actions">
+          <button className="btn btn-green" onClick={handleAddFunds}>
+            Add funds
+          </button>
+          <button className="btn btn-blue" onClick={handleWithdrawFunds}>
+            Withdraw
+          </button>
+        </div>
       </div>
 
       <div className="row">
+        {/* LEFT SIDE */}
         <div className="col">
-          <span>
-            <p>Equity</p>
-          </span>
+          <h3>Equity</h3>
 
           <div className="table">
-            <div className="data">
-              <p>Available margin</p>
-              <p className="imp colored">{format(availableMargin)}</p>
+            {/* MAIN BALANCE */}
+            <div className="row-item highlight">
+              <span>Available margin</span>
+              <span className="value colored">{format(availableMargin)}</span>
             </div>
 
-            <div className="data">
-              <p>Used margin</p>
-              <p className="imp">{format(usedMargin)}</p>
+            <div className="row-item">
+              <span>Used margin</span>
+              <span className="value">{format(usedMargin)}</span>
             </div>
 
-            <div className="data">
-              <p>Available funds</p>
-              <p className="imp">{format(availableFunds)}</p>
-            </div>
-
-            <hr />
-
-            <div className="data">
-              <p>Opening Balance</p>
-              <p>{format(investment)}</p>
-            </div>
-
-            <div className="data">
-              <p>Payin</p>
-              <p>{format(currentValue)}</p>
-            </div>
-
-            <div className="data">
-              <p>SPAN</p>
-              <p>₹0.00</p>
-            </div>
-
-            <div className="data">
-              <p>Delivery margin</p>
-              <p>₹0.00</p>
-            </div>
-
-            <div className="data">
-              <p>Exposure</p>
-              <p>₹0.00</p>
-            </div>
-
-            <div className="data">
-              <p>Options premium</p>
-              <p>₹0.00</p>
+            <div className="row-item">
+              <span>Available funds</span>
+              <span className="value">{format(availableFunds)}</span>
             </div>
 
             <hr />
 
-            <div className="data">
-              <p>Collateral (Liquid funds)</p>
-              <p>₹0.00</p>
+            {/* DETAILS */}
+            <div className="row-item">
+              <span>Opening balance</span>
+              <span>{format(investment)}</span>
             </div>
 
-            <div className="data">
-              <p>Collateral (Equity)</p>
-              <p>₹0.00</p>
+            <div className="row-item">
+              <span>Payin</span>
+              <span>{format(currentValue)}</span>
             </div>
 
-            <div className="data">
-              <p>Total Collateral</p>
-              <p>₹0.00</p>
+            <div className="row-item">
+              <span>SPAN</span>
+              <span>₹0.00</span>
+            </div>
+
+            <div className="row-item">
+              <span>Delivery margin</span>
+              <span>₹0.00</span>
+            </div>
+
+            <div className="row-item">
+              <span>Exposure</span>
+              <span>₹0.00</span>
+            </div>
+
+            <div className="row-item">
+              <span>Options premium</span>
+              <span>₹0.00</span>
+            </div>
+
+            <hr />
+
+            {/* COLLATERAL */}
+            <div className="row-item">
+              <span>Collateral (Liquid funds)</span>
+              <span>₹0.00</span>
+            </div>
+
+            <div className="row-item">
+              <span>Collateral (Equity)</span>
+              <span>₹0.00</span>
+            </div>
+
+            <div className="row-item total">
+              <span>Total collateral</span>
+              <span>₹0.00</span>
             </div>
           </div>
         </div>
 
-        <div className="col">
+        {/* RIGHT SIDE */}
+        {/* <div className="col">
           <div className="commodity">
             <p>You don't have a commodity account</p>
-            <Link className="btn btn-blue">Open Account</Link>
+            <button className="btn btn-blue">Open Account</button>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );

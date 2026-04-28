@@ -17,7 +17,7 @@ const SellActionWindow = ({ uid }) => {
         price: stockPrice,
         mode: "SELL",
       },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     GeneralContext.closeSellWindow();
