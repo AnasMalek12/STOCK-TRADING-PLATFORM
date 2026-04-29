@@ -146,6 +146,16 @@ app.post("/withdrawFunds", requireAuth, async (req, res) => {
 });
 
 app.post("/newOrder", requireAuth, async (req, res) => {
+  if (req.body.mode === "BUY") {
+    const buyQty = Number(req.body.qty);
+    const buyPrice = Number(req.body.price);
+    const totalBuyValue = buyQty * buyPrice;
+
+    if ((req.user.balance || 0) < totalBuyValue) {
+      return res.status(400).json({ message: "Insufficient funds to buy stocks" });
+    }
+  }
+
   let newOrder = new OrdersModel({
     userId: req.user._id,
     name: req.body.name,
@@ -165,29 +175,59 @@ app.post("/newOrder", requireAuth, async (req, res) => {
     req.user.balance = (req.user.balance || 0) - totalBuyValue;
     await req.user.save();
 
-    let newHolding = new HoldingsModel({
+    let existingHolding = await HoldingsModel.findOne({
       userId: req.user._id,
       name: req.body.name,
-      qty: req.body.qty,
-      avg: req.body.price,
-      price: req.body.price,
-      net: "+0.00%",
-      day: "+0.00%",
     });
-    await newHolding.save();
 
-    let newPosition = new PositionsModel({
+    if (existingHolding) {
+      const oldQty = existingHolding.qty;
+      const oldAvg = existingHolding.avg;
+      const totalOldValue = oldQty * oldAvg;
+      
+      existingHolding.qty = oldQty + buyQty;
+      existingHolding.avg = (totalOldValue + totalBuyValue) / existingHolding.qty;
+      await existingHolding.save();
+    } else {
+      let newHolding = new HoldingsModel({
+        userId: req.user._id,
+        name: req.body.name,
+        qty: req.body.qty,
+        avg: req.body.price,
+        price: req.body.price,
+        net: "+0.00%",
+        day: "+0.00%",
+      });
+      await newHolding.save();
+    }
+
+    let existingPosition = await PositionsModel.findOne({
       userId: req.user._id,
-      product: "CNC",
       name: req.body.name,
-      qty: req.body.qty,
-      avg: req.body.price,
-      price: req.body.price,
-      net: "+0.00%",
-      day: "+0.00%",
-      isLoss: false,
     });
-    await newPosition.save();
+
+    if (existingPosition) {
+      const oldQty = existingPosition.qty;
+      const oldAvg = existingPosition.avg;
+      const totalOldValue = oldQty * oldAvg;
+      
+      existingPosition.qty = oldQty + buyQty;
+      existingPosition.avg = (totalOldValue + totalBuyValue) / existingPosition.qty;
+      await existingPosition.save();
+    } else {
+      let newPosition = new PositionsModel({
+        userId: req.user._id,
+        product: "CNC",
+        name: req.body.name,
+        qty: req.body.qty,
+        avg: req.body.price,
+        price: req.body.price,
+        net: "+0.00%",
+        day: "+0.00%",
+        isLoss: false,
+      });
+      await newPosition.save();
+    }
   } else if (req.body.mode === "SELL") {
     const sellQty = Number(req.body.qty);
     const sellPrice = Number(req.body.price);

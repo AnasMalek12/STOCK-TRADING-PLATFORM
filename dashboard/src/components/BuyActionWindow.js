@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import axios from "axios";
 
@@ -10,20 +12,29 @@ import "./BuyActionWindow.css";
 const BuyActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
+  const generalContext = useContext(GeneralContext);
 
-  const handleBuyClick = () => {
-    axios.post(
-      "http://localhost:3002/newOrder",
-      {
-        name: uid,
-        qty: stockQuantity,
-        price: stockPrice,
-        mode: "BUY",
-      },
-      { withCredentials: true }
-    );
-
-    GeneralContext.closeBuyWindow();
+  const handleBuyClick = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3002/newOrder",
+        {
+          name: uid,
+          qty: stockQuantity,
+          price: stockPrice,
+          mode: "BUY",
+        },
+        { withCredentials: true }
+      );
+      generalContext.closeBuyWindow();
+    } catch (err) {
+      if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
+      }
+      else {
+        toast.error("Failed to buy stock");
+      }
+    }
   };
 
   const handleCancelClick = () => {
@@ -32,6 +43,7 @@ const BuyActionWindow = ({ uid }) => {
 
   return (
     <div className="container" id="buy-window" draggable="true">
+      <ToastContainer position="top-right" autoClose={2000} />
       <div className="regular-order">
         <div className="inputs">
           <fieldset>

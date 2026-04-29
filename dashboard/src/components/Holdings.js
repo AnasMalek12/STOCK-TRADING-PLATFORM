@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import GeneralContext from "./GeneralContext";
 import axios from "axios";
 import io from "socket.io-client";
 import { VerticalGraph } from "./VerticalGraph";
@@ -8,6 +9,7 @@ const socket = io("http://localhost:3002");
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
+  const generalContext = useContext(GeneralContext);
 
   // ✅ fetch initial data
   useEffect(() => {
@@ -98,7 +100,8 @@ const Holdings = () => {
               <th>Cur. val</th>
               <th>P&L</th>
               <th>Net chg.</th>
-              <th>Day chg.</th>
+              {/* <th>Day chg.</th> */}
+              <th>Action</th>
             </tr>
           </thead>
 
@@ -109,7 +112,7 @@ const Holdings = () => {
 
               const isProfit = pnl >= 0;
               const profClass = isProfit ? "profit" : "loss";
-              const dayClass = stock.isLoss ? "loss" : "profit";
+              // const dayClass = stock.isLoss ? "loss" : "profit";
 
               return (
                 <tr key={index}>
@@ -127,7 +130,16 @@ const Holdings = () => {
                   <td className={profClass}>{pnl.toFixed(2)}</td>
 
                   <td className={profClass}>{stock.net}</td>
-                  <td className={dayClass}>{stock.day}</td>
+                  {/* <td className={dayClass}>{stock.day}</td> */}
+                  <td>
+                    <button
+                      className="btn sell"
+                      onClick={() => generalContext.openSellWindow(stock.name)}
+                      style={{ padding: "4px 12px", fontSize: "0.8rem", margin: 0, cursor: "pointer" }}
+                    >
+                      Sell
+                    </button>
+                  </td>
                 </tr>
               );
             })}
