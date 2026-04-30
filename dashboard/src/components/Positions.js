@@ -3,7 +3,7 @@ import axios from "axios";
 import io from "socket.io-client";
 
 // ✅ connect to backend
-const socket = io("http://localhost:3002");
+const socket = io(process.env.REACT_APP_API_URL || "http://localhost:3002");
 
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
@@ -11,7 +11,7 @@ const Positions = () => {
   // ✅ fetch initial data
   useEffect(() => {
     axios
-      .get("http://localhost:3002/allPositions", {
+      .get(`${process.env.REACT_APP_API_URL || "http://localhost:3002"}/allPositions`, {
         withCredentials: true,
       })
       .then((res) => {

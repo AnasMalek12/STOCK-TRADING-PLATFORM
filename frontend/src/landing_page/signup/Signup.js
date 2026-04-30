@@ -27,7 +27,7 @@ function Signup() {
       if (isLogin) {
         // LOGIN API
         const res = await axios.post(
-          "http://localhost:3002/login",
+          `${process.env.REACT_APP_API_URL || "http://localhost:3002"}/login`,
           {
             email: formData.email,
             password: formData.password,
@@ -42,11 +42,11 @@ function Signup() {
 
         // Redirect to Dashboard (port 3001)
         setTimeout(() => {
-          window.location.href = "http://localhost:3001";
+          window.location.href = process.env.REACT_APP_DASHBOARD_URL || "http://localhost:3001";
         }, 1200);
       } else {
         // SIGNUP API
-        await axios.post("http://localhost:3002/signup", formData, {
+        await axios.post(`${process.env.REACT_APP_API_URL || "http://localhost:3002"}/signup`, formData, {
           withCredentials: true,
         });
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import io from "socket.io-client";
 import "./Summary.css";
 
-const socket = io("http://localhost:3002");
+const socket = io(process.env.REACT_APP_API_URL || "http://localhost:3002");
 
 const Summary = () => {
   const [holdings, setHoldings] = useState([]);
@@ -12,7 +12,7 @@ const Summary = () => {
   // ✅ Fetch holdings
   useEffect(() => {
     axios
-      .get("http://localhost:3002/allHoldings", {
+      .get(`${process.env.REACT_APP_API_URL || "http://localhost:3002"}/allHoldings`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -26,7 +26,7 @@ const Summary = () => {
   // ✅ fetch funds
   useEffect(() => {
     axios
-      .get("http://localhost:3002/userFunds", {
+      .get(`${process.env.REACT_APP_API_URL || "http://localhost:3002"}/userFunds`, {
         withCredentials: true,
       })
       .then((res) => setBalance(res.data.balance || 0))

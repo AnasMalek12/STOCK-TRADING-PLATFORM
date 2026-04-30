@@ -3,7 +3,7 @@ import axios from "axios";
 import io from "socket.io-client";
 // import { Link } from "react-router-dom";
 
-const socket = io("http://localhost:3002");
+const socket = io(process.env.REACT_APP_API_URL || "http://localhost:3002");
 
 const Funds = () => {
   const [holdings, setHoldings] = useState([]);
@@ -12,7 +12,7 @@ const Funds = () => {
   // ✅ fetch holdings
   useEffect(() => {
     axios
-      .get("http://localhost:3002/allHoldings", {
+      .get(`${process.env.REACT_APP_API_URL || "http://localhost:3002"}/allHoldings`, {
         withCredentials: true,
       })
       .then((res) => setHoldings(res.data));
@@ -21,7 +21,7 @@ const Funds = () => {
   // ✅ fetch funds
   useEffect(() => {
     axios
-      .get("http://localhost:3002/userFunds", {
+      .get(`${process.env.REACT_APP_API_URL || "http://localhost:3002"}/userFunds`, {
         withCredentials: true,
       })
       .then((res) => setBalance(res.data.balance || 0))
@@ -34,7 +34,7 @@ const Funds = () => {
     if (amount > 0) {
       axios
         .post(
-          "http://localhost:3002/addFunds",
+          `${process.env.REACT_APP_API_URL || "http://localhost:3002"}/addFunds`,
           { amount },
           { withCredentials: true },
         )
@@ -53,7 +53,7 @@ const Funds = () => {
       }
       axios
         .post(
-          "http://localhost:3002/withdrawFunds",
+          `${process.env.REACT_APP_API_URL || "http://localhost:3002"}/withdrawFunds`,
           { amount },
           { withCredentials: true },
         )

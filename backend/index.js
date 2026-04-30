@@ -25,10 +25,18 @@ const app = express();
 // ✅ CREATE SERVER FOR SOCKET
 const server = http.createServer(app);
 
+// ✅ ALLOWED ORIGINS (LOCAL + VERCEL)
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  process.env.FRONTEND_URL,
+  process.env.DASHBOARD_URL,
+].filter(Boolean); // Remove undefined values
+
 // ✅ SOCKET.IO SETUP
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -36,7 +44,7 @@ const io = new Server(server, {
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),

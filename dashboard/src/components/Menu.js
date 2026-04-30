@@ -18,13 +18,13 @@ const Menu = () => {
   const handleLogout = async () => {
     try {
       const { data } = await axios.post(
-        "http://localhost:3002/logout",
+        `${process.env.REACT_APP_API_URL || "http://localhost:3002"}/logout`,
         {},
         { withCredentials: true },
       );
       if (data.success) {
         localStorage.removeItem("token");
-        window.location.href = "http://localhost:3000";
+        window.location.href = process.env.REACT_APP_FRONTEND_URL || "http://localhost:3000";
       }
     } catch (err) {
       console.error(err);
@@ -36,7 +36,7 @@ const Menu = () => {
     const fetchUser = async () => {
       try {
         const { data } = await axios.post(
-          "http://localhost:3002/",
+          `${process.env.REACT_APP_API_URL || "http://localhost:3002"}/`,
           {},
           { withCredentials: true },
         );

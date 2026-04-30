@@ -8,7 +8,7 @@ import "./WatchList.css";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { DoughnutChart } from "./DoughnutChart";
 // ✅ WebSocket connection
-const socket = io("http://localhost:3002", {
+const socket = io(process.env.REACT_APP_API_URL || "http://localhost:3002", {
   transports: ["websocket"],
 });
 socket.on("connect", () => {
