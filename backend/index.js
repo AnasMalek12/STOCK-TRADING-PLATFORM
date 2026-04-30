@@ -21,6 +21,7 @@ const PORT = process.env.PORT || 3002;
 const uri = process.env.MONGO_URL;
 
 const app = express();
+app.set("trust proxy", 1); // Trust the proxy so Render can set secure cookies
 
 // ✅ CREATE SERVER FOR SOCKET
 const server = http.createServer(app);
