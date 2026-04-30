@@ -3,10 +3,11 @@ const { createSecretToken } = require("../util/SecretToken");
 const bcrypt = require("bcryptjs");
 
 // Standardized cookie options for reuse
+const isProduction = process.env.NODE_ENV === "production";
 const cookieOptions = {
   httpOnly: true, // Prevents XSS attacks
-  secure: process.env.NODE_ENV === "production", // Requires HTTPS in production
-  sameSite: "strict", // Prevents CSRF attacks
+  secure: isProduction, // Requires HTTPS in production
+  sameSite: isProduction ? "none" : "strict", // "none" allows cross-origin cookies in prod
   maxAge: 24 * 60 * 60 * 1000, // 1 day (match JWT expiry)
 };
 
@@ -96,8 +97,8 @@ module.exports.Logout = async (req, res) => {
     // used to set the cookie, except for maxAge/expires.
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "strict",
     });
 
     return res
