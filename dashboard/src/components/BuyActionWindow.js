@@ -12,7 +12,7 @@ import "./BuyActionWindow.css";
 const BuyActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
-  const generalContext = useContext(GeneralContext);
+  const { closeBuyWindow } = useContext(GeneralContext);
 
   const handleBuyClick = async () => {
     try {
@@ -24,21 +24,20 @@ const BuyActionWindow = ({ uid }) => {
           price: stockPrice,
           mode: "BUY",
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
-      generalContext.closeBuyWindow();
+      closeBuyWindow();
     } catch (err) {
       if (err.response?.data?.message) {
         toast.error(err.response.data.message);
-      }
-      else {
+      } else {
         toast.error("Failed to buy stock");
       }
     }
   };
 
   const handleCancelClick = () => {
-    GeneralContext.closeBuyWindow();
+    closeBuyWindow();
   };
 
   return (

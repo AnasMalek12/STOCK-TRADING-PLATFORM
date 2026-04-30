@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import GeneralContext from "./GeneralContext";
@@ -7,6 +7,7 @@ import "./BuyActionWindow.css"; // We'll reuse the buy action css since it works
 const SellActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
+  const { closeSellWindow } = useContext(GeneralContext);
 
   const handleSellClick = () => {
     axios.post(
@@ -20,11 +21,11 @@ const SellActionWindow = ({ uid }) => {
       { withCredentials: true },
     );
 
-    GeneralContext.closeSellWindow();
+    closeSellWindow();
   };
 
   const handleCancelClick = () => {
-    GeneralContext.closeSellWindow();
+    closeSellWindow();
   };
 
   return (
