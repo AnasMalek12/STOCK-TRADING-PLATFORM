@@ -20,7 +20,7 @@ function ProductPage() {
       <RightSection
         imageURL="media/images/console.png"
         productName="Console"
-        productDesctiption="The central dashboard for your Zerodha account. Gain insights into your trades and investments with in-depth reports and visualisations."
+        productDesctiption="The central dashboard for your Charustock account. Gain insights into your trades and investments with in-depth reports and visualisations."
         learnMore=""
       />
       <LeftSection
@@ -49,8 +49,8 @@ function ProductPage() {
         appStore=""
       />
       <p className="text-center">
-        Want to know more about our technology stack? Check out the Zerodha.tech
-        blog.
+        Want to know more about our technology stack? Check out the
+        Charustock.tech blog.
       </p>
       <Universe />
     </>

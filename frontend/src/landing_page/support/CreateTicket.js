@@ -7,7 +7,7 @@ function CreateTicket() {
         {/* LEFT SIDE */}
         <div className="col-12 col-lg-8">
           <div className="border rounded p-3 mb-3">Account Opening</div>
-          <div className="border rounded p-3 mb-3">Your Zerodha Account</div>
+          <div className="border rounded p-3 mb-3">Your Charustock Account</div>
           <div className="border rounded p-3 mb-3">Kite</div>
           <div className="border rounded p-3 mb-3">Funds</div>
           <div className="border rounded p-3 mb-3">Console</div>

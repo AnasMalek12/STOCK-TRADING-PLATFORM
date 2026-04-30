@@ -9,8 +9,8 @@ function Stats() {
 
           <h2 className="fs-5">Customer-first always</h2>
           <p className="text-muted">
-            That's why 1.6+ crore customers trust Zerodha with ~ ₹6 lakh crores
-            of equity investments, making us India’s largest broker;
+            That's why 1.6+ crore customers trust Charustock with ~ ₹6 lakh
+            crores of equity investments, making us India’s largest broker;
             contributing to 15% of daily retail exchange volumes in India.
           </p>
 
@@ -20,7 +20,7 @@ function Stats() {
             High quality apps that you use at your pace, the way you like.
           </p>
 
-          <h2 className="fs-5">The Zerodha universe</h2>
+          <h2 className="fs-5">The Charustock universe</h2>
           <p className="text-muted">
             Not just an app, but a whole ecosystem. Our investments in 30+
             fintech startups offer you tailored services.

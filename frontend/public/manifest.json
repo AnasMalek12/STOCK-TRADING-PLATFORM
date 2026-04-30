@@ -1,9 +1,16 @@
 {
-  "short_name": "React App",
-  "name": "React App",
-  "icons": [],
+  "short_name": "Charustock",
+  "name": "Charustock: Stock Trading Platform",
+  "description": "A modern and comprehensive platform for tracking and trading stocks in real-time.",
+  "icons": [
+    {
+      "src": "media/images/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#387ed1",
   "background_color": "#ffffff"
 }

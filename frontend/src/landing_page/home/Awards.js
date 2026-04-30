@@ -10,7 +10,7 @@ function Awards() {
         <div className="col-12 col-md-6">
           <h1 className="fs-4 fs-md-2">Largest stock broker in india</h1>
           <p className="mb-4">
-            2+ million Zerodha clients contribute to over 15% of all retail
+            2+ million Charustock clients contribute to over 15% of all retail
             order volumes in india daily by trading and investing in:
           </p>
           <div className="row">

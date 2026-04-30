@@ -1,0 +1,16 @@
+{
+  "short_name": "Charustock: Dashboard",
+  "name": "Charustock - Trading Dashboard",
+  "description": "Your personal dashboard for managing trades and tracking portfolio performance on Charustock.",
+  "icons": [
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#387ed1",
+  "background_color": "#ffffff"
+}

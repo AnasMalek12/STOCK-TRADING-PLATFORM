@@ -11,7 +11,7 @@ function Navbar() {
         <Link className="navbar-brand" to="/">
           <img
             src="media\images\logo.svg"
-            style={{ width: "25%" }}
+            style={{ width: "55%" }}
             alt="Logo"
           />
         </Link>
@@ -27,7 +27,10 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <form className="d-flex" role="search">
+          <div
+            className="collapse navbar-collapse justify-content-end"
+            id="navbarSupportedContent"
+          >
             <ul className="navbar-nav mb-lg-0">
               <li className="nav-item">
                 <Link
@@ -59,7 +62,7 @@ function Navbar() {
                 </Link>
               </li>
             </ul>
-          </form>
+          </div>
         </div>
       </div>
     </nav>

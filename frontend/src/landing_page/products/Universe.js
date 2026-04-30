@@ -3,7 +3,7 @@ import React from "react";
 function Universe() {
   return (
     <div className="container mt-5 text-center">
-      <h1 className="mb-3 fw-semibold">The Zerodha Universe</h1>
+      <h1 className="mb-3 fw-semibold">The Charustock Universe</h1>
       <p className="text-muted mx-auto" style={{ maxWidth: "700px" }}>
         Extend your trading and investment experience even further with our
         partner platforms
