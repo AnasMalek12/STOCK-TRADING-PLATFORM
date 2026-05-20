@@ -10,6 +10,9 @@
 
 Charustock is a comprehensive web application designed to simulate the fast-paced environment of stock trading. It provides users with a secure platform to manage investments, track real-time simulated market movements, and visualize portfolio performance—all without relying on external financial APIs.
 
+## 🌐 Interactive Project Presentation 
+➔ **📑 [Explore the Live Presentation](https://anasmalek12.github.io/HTML-CSS-JAVASCRIPT/CharuStock%20Doc%20(HTML-CSS-JS))**
+
 ## ✨ Key Features
 
 * **Real-Time Market Simulation:** Utilizes **Socket.io** to push live, simulated stock price updates continuously to the client, creating a dynamic trading environment.
